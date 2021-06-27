@@ -29,7 +29,11 @@ public class GameBoard {
 
         if ((applesOnBoard.size() < (maxApples / 3)) ||
                 ((applesOnBoard.size() < maxApples) && (rand(5) == 0))) {
-            applesOnBoard.add(newApples.poll());
+            Pair<Integer> newLocation;
+            do {
+                newLocation = newApples.poll();
+            } while (applesOnBoard.contains(newLocation));
+            applesOnBoard.add(newLocation);
         }
     }
 
