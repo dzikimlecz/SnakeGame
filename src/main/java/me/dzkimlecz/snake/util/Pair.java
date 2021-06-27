@@ -2,10 +2,7 @@ package me.dzkimlecz.snake.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Pair<E> implements Collection<E> {
@@ -18,6 +15,19 @@ public class Pair<E> implements Collection<E> {
         this.first = first;
         this.second = second;
         content = new Object[] {first, second};
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pair)) return false;
+        Pair<?> pair = (Pair<?>) o;
+        return first.equals(pair.first) && second.equals(pair.second);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(first, second);
     }
 
     public @NotNull E first() {
