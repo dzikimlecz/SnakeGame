@@ -13,7 +13,7 @@ public class GameBoard {
     private final Queue<Pair<Integer>> newApples;
     private final List<Pair<Integer>> applesOnBoard;
     private final int maxApples;
-    private final List<List<SquareState>> squareStates;
+    private final List<List<SimpleObjectProperty<SquareState>>> squareStateProperties;
 
 
     public GameBoard(int size) {
@@ -25,11 +25,11 @@ public class GameBoard {
         this.maxApples = maxApples;
         newApples = new ArrayDeque<>(5);
         applesOnBoard = new LinkedList<>();
-        squareStates = new ArrayList<>();
+        squareStateProperties = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            squareStates.add(new ArrayList<>());
+            squareStateProperties.add(new ArrayList<>());
             for (int j = 0; j < size; j++)
-                squareStates.get(i).add(EMPTY);
+                squareStateProperties.get(i).add(new SimpleObjectProperty<>(EMPTY));
         }
     }
 
