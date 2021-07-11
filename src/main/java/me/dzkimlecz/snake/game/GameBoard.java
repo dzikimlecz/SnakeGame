@@ -9,7 +9,12 @@ import java.util.concurrent.ThreadLocalRandom;
 import static me.dzkimlecz.snake.game.SquareState.*;
 
 public class GameBoard {
+
     private final int size;
+    public int size() {
+        return size;
+    }
+
     private final Queue<Pair<Integer>> newApples;
     private final List<Pair<Integer>> applesOnBoard;
     private final int maxApples;
