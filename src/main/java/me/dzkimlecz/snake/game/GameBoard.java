@@ -57,6 +57,14 @@ public class GameBoard {
         return List.copyOf(applesOnBoard);
     }
 
+    public SimpleObjectProperty<SquareState> squareStateProperty(int x, int y) {
+        return squareStateProperties.get(y).get(x);
+    }
+
+    public SquareState getSquareState(int x, int y) {
+        return squareStateProperty(x, y).get();
+    }
+
 
     private static int rand(int bound) {
         return ThreadLocalRandom.current().nextInt(bound);
