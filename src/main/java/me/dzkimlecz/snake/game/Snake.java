@@ -54,7 +54,9 @@ public class Snake {
         return body.stream().filter(e -> e.equals(body.getFirst())).count() > 1;
     }
 
-
+    public Pair<Integer> headLocation() {
+        return body.getFirst();
+    }
 
 
 }
