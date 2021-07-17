@@ -2,9 +2,11 @@ package me.dzkimlecz.snake.game;
 
 import me.dzkimlecz.snake.util.Pair;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class Snake {
     private final Deque<Pair<Integer>> body;
@@ -58,5 +60,8 @@ public class Snake {
         return body.getFirst();
     }
 
+    public Collection<Pair<Integer>> bodyLocation() {
+        return body.stream().collect(Collectors.toUnmodifiableList());
+    }
 
 }
