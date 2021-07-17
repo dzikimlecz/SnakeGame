@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Snake {
     private final Deque<Pair<Integer>> body;
     private final AtomicReference<Direction> direction;
+    private final AtomicReference<Pair<Integer>> leftSquare = new AtomicReference<>();
 
     public Snake() {
         direction = new AtomicReference<>();
@@ -21,7 +22,7 @@ public class Snake {
     }
 
     public void move() {
-        body.removeLast();
+        leftSquare.set(body.removeLast());
         final var direction = this.direction.get();
         final Pair<Integer> delta;
         switch (direction) {
@@ -43,5 +44,9 @@ public class Snake {
         final var head = body.getFirst();
         final var newHead = new Pair<>(head.first() + delta.first(), head.second() + delta.second());
         body.addFirst(newHead);
+    }
+
+    public void grow() {
+        body.addLast(leftSquare.get());
     }
 }
