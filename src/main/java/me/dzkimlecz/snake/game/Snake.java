@@ -21,7 +21,7 @@ public class Snake {
             this.direction.set(direction);
     }
 
-    public void move() {
+    public synchronized void move() {
         leftSquare.set(body.removeLast());
         final var direction = this.direction.get();
         final Pair<Integer> delta;
@@ -49,4 +49,12 @@ public class Snake {
     public void grow() {
         body.addLast(leftSquare.get());
     }
+
+    public boolean overlaysItself() {
+        return body.stream().filter(e -> e.equals(body.getFirst())).count() > 1;
+    }
+
+
+
+
 }
