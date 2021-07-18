@@ -2,6 +2,7 @@ package me.dzkimlecz.snake.game;
 
 import javafx.beans.property.SimpleObjectProperty;
 import me.dzkimlecz.snake.util.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -38,17 +39,26 @@ public class GameBoard {
         }
     }
 
+    /**
+     * generates new apples, and puts one on the board.
+     */
     public void tick() {
+        //makes sure that there will be at least 3 apples in reserve, but also not more than 5
         if (newApples.size() < 5) do {
             newApples.offer(new Pair<>(rand(size), rand(size)));
         } while(newApples.size() < 3);
 
+        // spawns apple if there are less than a third of the limit,
+        // or else if the limit hasn't been surpassed yet, spawns apple on a chance of 1 to 5
         if ((applesOnBoard.size() < (maxApples / 3)) ||
                 ((applesOnBoard.size() < maxApples) && (rand(5) == 0))) {
             Pair<Integer> newLocation;
+            // polls new apple location from the reserve
             do {
-                newLocation = newApples.poll();
-            } while (applesOnBoard.contains(newLocation));
+                newLocation = Objects.requireNonNull(newApples.poll());
+            } // repeats if there already is such apple on the board, or the location is occupied by a snake
+            while (applesOnBoard.contains(newLocation) || squareStateProperty(newLocation).get().isSnake());
+            //commits a valid apple
             applesOnBoard.add(newLocation);
         }
     }
