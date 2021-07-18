@@ -80,18 +80,35 @@ public class GameBoard {
         return squareStateProperty(x, y).get();
     }
 
+    /**
+     * Sets squares on the board to contain a snake, makes snake grow if it ate an apple.
+     * @param snake snake to be shown on the board
+     * @throws SnakeDeadException if the snake has extended board limits or has hit itself
+     */
     public void update(Snake snake) throws SnakeDeadException {
         final var location = snake.bodyLocation();
+        // checks if any of the snake segments is out of the board or if it hit itself
         if (location.stream().anyMatch(xy -> xy.stream().anyMatch(i -> i < 0 || i > size)) || snake.overlaysItself())
             throw new SnakeDeadException();
         final var headLocation = snake.headLocation();
+        // if head was at a location of an apple, snake eats it and grows
         if (applesOnBoard.remove(headLocation)) snake.grow();
         squareStateProperty(headLocation).set(SNAKE_HEAD);
-        location.stream().dropWhile(e -> e.equals(headLocation))
+        // marks all the squares containing the snake, except of the head, as the SNAKE_BODY
+        location.stream()
+                // excludes head
+                .dropWhile(e -> e.equals(headLocation))
+                // maps to the corresponding square
                 .map(this::squareStateProperty)
+                // marks as a part of the body
                 .forEach(e -> e.set(SNAKE_BODY));
     }
 
+    /**
+     * just a shorthand for {@code ThreadLocalRandom.current().nextInt(bound)}
+     * @param bound the upper bound
+     * @return random integer in between 0 (inclusive) and bound (exclusive)
+     */
     private static int rand(int bound) {
         return ThreadLocalRandom.current().nextInt(bound);
     }
