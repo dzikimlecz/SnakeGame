@@ -49,7 +49,10 @@ public class Snake {
     }
 
     public void grow() {
-        body.addLast(leftSquare.get());
+        final var e = leftSquare.get();
+        if (e == null)
+            throw new IllegalStateException("Can't grow snake, which hasn't moved yet");
+        body.addLast(e);
     }
 
     public boolean overlaysItself() {
