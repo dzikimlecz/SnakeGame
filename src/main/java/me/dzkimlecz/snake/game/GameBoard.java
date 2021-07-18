@@ -71,6 +71,10 @@ public class GameBoard {
         return squareStateProperties.get(y).get(x);
     }
 
+    public SimpleObjectProperty<SquareState> squareStateProperty(@NotNull Pair<Integer> xy) {
+        return squareStateProperty(xy.first(), xy.second());
+    }
+
     public SquareState getSquareState(int x, int y) {
         return squareStateProperty(x, y).get();
     }
