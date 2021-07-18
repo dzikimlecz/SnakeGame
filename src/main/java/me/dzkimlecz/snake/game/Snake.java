@@ -15,9 +15,10 @@ public class Snake {
     private final AtomicReference<Direction> direction;
     private final AtomicReference<Pair<Integer>> leftSquare = new AtomicReference<>();
 
-    public Snake() {
+    public Snake(Pair<Integer> location) {
         direction = new AtomicReference<>(TOP);
         body = new LinkedList<>();
+        body.addFirst(location);
     }
 
     private void turn(Direction direction) {

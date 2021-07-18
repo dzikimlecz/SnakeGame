@@ -2,15 +2,14 @@ package me.dzkimlecz.snake;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import me.dzkimlecz.snake.components.BoardView;
 import me.dzkimlecz.snake.controller.Timer;
 import me.dzkimlecz.snake.game.GameBoard;
 import me.dzkimlecz.snake.game.Snake;
+import me.dzkimlecz.snake.util.Pair;
 
 public class SnakeGame extends Application {
     private Timer timer;
@@ -31,7 +30,7 @@ public class SnakeGame extends Application {
     }
 
     public void startGame() {
-        timer = new Timer(snake = new Snake(), board = new GameBoard(15));
+        timer = new Timer(snake = new Snake(Pair.of(7, 7)), board = new GameBoard(15));
         boardView.bind(board);
         timer.start();
     }
