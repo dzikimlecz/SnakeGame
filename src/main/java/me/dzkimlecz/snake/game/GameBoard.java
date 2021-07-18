@@ -80,10 +80,10 @@ public class GameBoard {
         return squareStateProperty(x, y).get();
     }
 
-    public void update(Snake snake) throws Exception {
+    public void update(Snake snake) throws SnakeDeadException {
         final var location = snake.bodyLocation();
         if (location.stream().anyMatch(xy -> xy.stream().anyMatch(i -> i < 0 || i > size)) || snake.overlaysItself())
-            throw new Exception();
+            throw new SnakeDeadException();
         final var headLocation = snake.headLocation();
         if (applesOnBoard.remove(headLocation)) snake.grow();
         squareStateProperty(headLocation).set(SNAKE_HEAD);
