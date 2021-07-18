@@ -60,6 +60,7 @@ public class GameBoard {
             while (applesOnBoard.contains(newLocation) || squareStateProperty(newLocation).get().isSnake());
             //commits a valid apple
             applesOnBoard.add(newLocation);
+            squareStateProperty(newLocation).set(APPLE);
         }
     }
 
