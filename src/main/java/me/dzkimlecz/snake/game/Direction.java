@@ -1,14 +1,14 @@
 package me.dzkimlecz.snake.game;
 
 public enum Direction {
-    UP, DOWN, LEFT, RIGHT;
+    TOP, BOTTOM, LEFT, RIGHT;
 
     public boolean isOppositeTo(Direction other) {
         switch (this) {
-            case UP:
-                return other == DOWN;
-            case DOWN:
-                return other == UP;
+            case TOP:
+                return other == BOTTOM;
+            case BOTTOM:
+                return other == TOP;
             case LEFT:
                 return other == RIGHT;
             case RIGHT:

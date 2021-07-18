@@ -8,13 +8,15 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import static me.dzkimlecz.snake.game.Direction.*;
+
 public class Snake {
     private final Deque<Pair<Integer>> body;
     private final AtomicReference<Direction> direction;
     private final AtomicReference<Pair<Integer>> leftSquare = new AtomicReference<>();
 
     public Snake() {
-        direction = new AtomicReference<>();
+        direction = new AtomicReference<>(TOP);
         body = new LinkedList<>();
     }
 
@@ -28,10 +30,10 @@ public class Snake {
         final var direction = this.direction.get();
         final Pair<Integer> delta;
         switch (direction) {
-            case UP:
+            case TOP:
                 delta = new Pair<>(0, -1);
                 break;
-            case DOWN:
+            case BOTTOM:
                 delta = new Pair<>(0, 1);
                 break;
             case LEFT:
