@@ -80,6 +80,17 @@ public class GameBoard {
         return squareStateProperty(x, y).get();
     }
 
+    public void update(Snake snake) throws Exception {
+        final var location = snake.bodyLocation();
+        if (location.stream().anyMatch(xy -> xy.stream().anyMatch(i -> i < 0 || i > size)) || snake.overlaysItself())
+            throw new Exception();
+        final var headLocation = snake.headLocation();
+        if (applesOnBoard.remove(headLocation)) snake.grow();
+        squareStateProperty(headLocation).set(SNAKE_HEAD);
+        location.stream().dropWhile(e -> e.equals(headLocation))
+                .map(this::squareStateProperty)
+                .forEach(e -> e.set(SNAKE_BODY));
+    }
 
     private static int rand(int bound) {
         return ThreadLocalRandom.current().nextInt(bound);
