@@ -31,22 +31,22 @@ public class Snake {
         final Pair<Integer> delta;
         switch (direction) {
             case TOP:
-                delta = new Pair<>(0, -1);
+                delta = Pair.of(0, -1);
                 break;
             case BOTTOM:
-                delta = new Pair<>(0, 1);
+                delta = Pair.of(0, 1);
                 break;
             case LEFT:
-                delta = new Pair<>(-1, 0);
+                delta = Pair.of(-1, 0);
                 break;
             case RIGHT:
-                delta = new Pair<>(1, 0);
+                delta = Pair.of(1, 0);
                 break;
             default:
                 throw new AssertionError();
         }
         final var head = body.getFirst();
-        final var newHead = new Pair<>(head.first() + delta.first(), head.second() + delta.second());
+        final var newHead = Pair.of(head.first() + delta.first(), head.second() + delta.second());
         body.addFirst(newHead);
     }
 

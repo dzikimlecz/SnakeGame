@@ -45,7 +45,7 @@ public class GameBoard {
     public void tick() {
         //makes sure that there will be at least 3 apples in reserve, but also not more than 5
         if (newApples.size() < 5) do {
-            newApples.offer(new Pair<>(rand(size), rand(size)));
+            newApples.offer(Pair.of(rand(size), rand(size)));
         } while(newApples.size() < 3);
 
         // spawns apple if there are less than a third of the limit,

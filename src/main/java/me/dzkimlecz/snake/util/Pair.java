@@ -5,16 +5,20 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Pair<E> implements Collection<E> {
+public final class Pair<E> implements Collection<E> {
 
     private final E first;
     private final E second;
     private final Object[] content;
 
-    public Pair(@NotNull E first, @NotNull E second) {
+    private Pair(E first, E second) {
         this.first = first;
         this.second = second;
         content = new Object[] {first, second};
+    }
+
+    public static <T> Pair<T> of(@NotNull T e, @NotNull T e1) {
+        return new Pair<>(e, e1);
     }
 
     @Override
@@ -54,7 +58,7 @@ public class Pair<E> implements Collection<E> {
     }
 
     @Override
-    public Iterator<E> iterator() {
+    public @NotNull Iterator<E> iterator() {
         return new Iterator<>() {
             private final AtomicInteger cursor = new AtomicInteger(-1);
             @Override
@@ -83,7 +87,7 @@ public class Pair<E> implements Collection<E> {
     }
 
     @Override
-    public <T> T[] toArray(T @NotNull [] a) {
+    public <T> T @NotNull [] toArray(T @NotNull [] a) {
         if (a.length < 2) {
             try {
                 @SuppressWarnings("unchecked")
