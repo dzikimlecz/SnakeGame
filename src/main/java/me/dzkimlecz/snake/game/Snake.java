@@ -59,7 +59,8 @@ public class Snake {
     }
 
     public boolean overlaysItself() {
-        return body.stream().filter(e -> e.equals(body.getFirst())).count() > 1;
+        if (body.stream().filter(e -> e.equals(body.getFirst())).count() > 1) return true;
+        else return body.stream().distinct().count() < body.size();
     }
 
     public Pair<Integer> headLocation() {
