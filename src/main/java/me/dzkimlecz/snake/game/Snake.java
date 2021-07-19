@@ -27,7 +27,6 @@ public class Snake {
     }
 
     public synchronized void move() {
-        leftSquare.set(body.removeLast());
         final var direction = this.direction.get();
         final Pair<Integer> delta;
         switch (direction) {
@@ -47,6 +46,7 @@ public class Snake {
                 throw new AssertionError();
         }
         final var head = body.getFirst();
+        leftSquare.set(body.removeLast());
         final var newHead = Pair.of(head.first() + delta.first(), head.second() + delta.second());
         body.addFirst(newHead);
     }
