@@ -30,6 +30,11 @@ public final class Pair<E> implements Collection<E> {
     }
 
     @Override
+    public String toString() {
+        return "{" + first + " to " + second + "}";
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(first, second);
     }
