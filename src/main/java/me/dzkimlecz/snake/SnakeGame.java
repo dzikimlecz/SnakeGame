@@ -15,9 +15,6 @@ import me.dzkimlecz.snake.util.Pair;
 import static me.dzkimlecz.snake.controller.GameEvent.*;
 
 public class SnakeGame extends Application {
-    private Timer timer;
-    private GameBoard board;
-    private Snake snake;
     private BoardView boardView;
 
     @Override
