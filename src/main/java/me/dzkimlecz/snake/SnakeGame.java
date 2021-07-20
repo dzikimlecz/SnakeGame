@@ -32,7 +32,8 @@ public class SnakeGame extends Application {
     public void startGame() {
         timer = new Timer(snake = new Snake(Pair.of(7, 7)), board = new GameBoard(15));
         boardView.bind(board);
-        timer.start();
+        timer.run();
+//        steering.run();
     }
 
 }

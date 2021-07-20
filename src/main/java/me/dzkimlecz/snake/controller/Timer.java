@@ -8,7 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-public class Timer {
+public class Timer implements Runnable {
     private final ScheduledExecutorService executor;
     private final Snake snake;
     private final GameBoard board;
@@ -19,7 +19,7 @@ public class Timer {
         executor = Executors.newSingleThreadScheduledExecutor();
     }
 
-    public void start() {
+    public void run() {
         if (executor.isShutdown())
             throw new IllegalStateException("Can't use the same timer object twice");
 
