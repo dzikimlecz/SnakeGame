@@ -27,7 +27,7 @@ public class Timer implements Runnable {
         if (executor.isShutdown())
             throw new IllegalStateException("Can't use the same timer object twice");
 
-        executor.scheduleAtFixedRate(() -> {
+        executor.scheduleWithFixedDelay(() -> {
             board.tick();
             snake.move();
             try {
