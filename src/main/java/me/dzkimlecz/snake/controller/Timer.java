@@ -2,16 +2,20 @@ package me.dzkimlecz.snake.controller;
 
 import me.dzkimlecz.snake.game.GameBoard;
 import me.dzkimlecz.snake.game.Snake;
+import me.dzkimlecz.snake.game.SnakeDeadException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public class Timer implements Runnable {
     private final ScheduledExecutorService executor;
     private final Snake snake;
     private final GameBoard board;
+    private @Nullable Runnable onGameEnd;
 
     public Timer(Snake snake, GameBoard board) {
         this.snake = snake;
@@ -26,10 +30,20 @@ public class Timer implements Runnable {
         executor.scheduleAtFixedRate(() -> {
             board.tick();
             snake.move();
-        }, 200, 200, MILLISECONDS);
+            try {
+                board.update(snake);
+            } catch (SnakeDeadException e) {
+                executor.shutdownNow();
+                if (onGameEnd != null) onGameEnd.run();
+            }
+        }, 3125, 3125, NANOSECONDS);
     }
 
     public void stop() {
         executor.shutdownNow();
+    }
+
+    public void setOnGameEnd(@NotNull Runnable onGameEnd) {
+        this.onGameEnd = onGameEnd;
     }
 }
