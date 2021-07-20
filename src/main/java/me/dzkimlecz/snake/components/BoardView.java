@@ -13,7 +13,6 @@ public class BoardView extends StackPane {
 
     public BoardView() {
         super();
-        // TODO: 27.06.2021  
         displayPane = new GridPane();
         super.getChildren().add(displayPane);
     }
