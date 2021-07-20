@@ -25,7 +25,7 @@ public class Timer implements Runnable {
 
     public void run() {
         if (executor.isShutdown())
-            throw new IllegalStateException("Can't use the same timer object twice");
+            throw new IllegalStateException("Can't use the same timer object more than once");
 
         executor.scheduleWithFixedDelay(() -> {
             board.tick();
