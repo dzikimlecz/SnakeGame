@@ -24,17 +24,15 @@ public class SnakeSteering implements Runnable {
             throw new IllegalStateException("Can't use the same object more than once");
 
         executor.scheduleWithFixedDelay(() -> {
-            while (true) {
                 GameEvent event = steeringInput.nextEvent();
-                if (event == GameEvent.STOP) {
-                    executor.shutdownNow();
-                    break;
-                }
                 if (event != null) {
+                    if (event == GameEvent.STOP) {
+                        executor.shutdownNow();
+                        return;
+                    }
                     if (event.DIRECTION == null) throw new AssertionError();
                     snake.turn(event.DIRECTION);
                 }
-            }
         }, 3125, 3125, NANOSECONDS);
     }
 
