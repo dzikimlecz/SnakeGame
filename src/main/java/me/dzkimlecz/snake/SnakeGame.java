@@ -62,6 +62,11 @@ public class SnakeGame extends Application {
             event.set(null);
             return gameEvent;
         });
+        timer.setOnGameEnd(() -> {
+            timer.stop();
+            steering.stop();
+            root.setOnKeyPressed(keyEvent -> {});
+        });
         boardView.bind(board);
         timer.run();
         steering.run();
