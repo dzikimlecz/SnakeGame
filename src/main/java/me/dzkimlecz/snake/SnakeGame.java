@@ -23,6 +23,7 @@ public class SnakeGame extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.sizeToScene();
         primaryStage.show();
+        startGame();
     }
 
     public void startGame() {
