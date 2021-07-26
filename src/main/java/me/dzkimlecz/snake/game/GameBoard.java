@@ -86,6 +86,14 @@ public class GameBoard {
      * @throws SnakeDeadException if the snake has extended board limits or has hit itself
      */
     public void update(Snake snake) throws SnakeDeadException {
+        // refreshes whole board
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                final var property = squareStateProperty(j, i);
+                if (property.get() != APPLE)
+                    property.set(EMPTY);
+            }
+        }
         final var location = snake.bodyLocation();
         // checks if any of the snake segments is out of the board or if it hit itself
         if (location.stream().anyMatch(xy -> xy.stream().anyMatch(i -> i < 0 || i > size)) || snake.overlaysItself())
