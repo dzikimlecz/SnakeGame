@@ -25,6 +25,7 @@ public class BoardView extends StackPane {
                 final var rectangle = new Rectangle();
                 rectangle.setHeight(50);
                 rectangle.setWidth(50);
+                rectangle.setFill(LIGHTGREY);
                 displayPane.add(rectangle, column, row);
                 board.squareStateProperty(column, row).addListener((obs, oldVal, newVal) -> {
                     switch (newVal) {
