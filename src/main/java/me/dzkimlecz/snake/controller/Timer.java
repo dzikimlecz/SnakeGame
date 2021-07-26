@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class Timer implements Runnable {
     private final ScheduledExecutorService executor;
@@ -36,7 +36,7 @@ public class Timer implements Runnable {
                 executor.shutdownNow();
                 if (onGameEnd != null) onGameEnd.run();
             }
-        }, 3125, 3125, NANOSECONDS);
+        }, 3000, 300, MILLISECONDS);
     }
 
     public void stop() {
