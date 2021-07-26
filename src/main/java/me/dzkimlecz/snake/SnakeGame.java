@@ -19,11 +19,7 @@ public class SnakeGame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        final var root = new BorderPane();
-        root.setCenter(boardView = new BoardView());
-        final var topBar = new VBox();
-        // TODO: 27.06.2021
-        root.setTop(topBar);
+        root = (boardView = new BoardView());
         primaryStage.setScene(new Scene(root));
         primaryStage.sizeToScene();
         primaryStage.show();
