@@ -1,21 +1,26 @@
 package me.dzkimlecz.snake;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import me.dzkimlecz.snake.components.BoardView;
+import me.dzkimlecz.snake.controller.GameEvent;
 import me.dzkimlecz.snake.controller.SnakeSteering;
 import me.dzkimlecz.snake.controller.Timer;
 import me.dzkimlecz.snake.game.GameBoard;
 import me.dzkimlecz.snake.game.Snake;
 import me.dzkimlecz.snake.util.Pair;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import static me.dzkimlecz.snake.controller.GameEvent.*;
 
 public class SnakeGame extends Application {
     private BoardView boardView;
+    private Timer timer;
+    private SnakeSteering steering;
+    private BoardView root;
 
     @Override
     public void start(Stage primaryStage) {
@@ -29,14 +34,33 @@ public class SnakeGame extends Application {
     public void startGame() {
         var snake = new Snake(Pair.of(7, 7));
         var board = new GameBoard(15);
-        var timer = new Timer(snake, board);
-        var steering = new SnakeSteering(snake, () -> {
-            final var location = snake.headLocation();
-            if (location.first() == 14) return TURN_BOTTOM;
-            else if (location.first() == 1) return TURN_TOP;
-            else if (location.second() == 14) return TURN_LEFT;
-            else if (location.second() == 1) return TURN_RIGHT;
-            else return null;
+        timer = new Timer(snake, board);
+        AtomicReference<GameEvent> event = new AtomicReference<>();
+        root.setOnKeyPressed(keyEvent -> {
+            final var code = keyEvent.getCode();
+            if (!code.isArrowKey()) return;
+            switch (code) {
+                case UP:
+                    event.set(TURN_TOP);
+                    break;
+                case DOWN:
+                    event.set(TURN_BOTTOM);
+                    break;
+                case RIGHT:
+                    event.set(TURN_RIGHT);
+                    break;
+                case LEFT:
+                    event.set(TURN_LEFT);
+                    break;
+                default:
+                    event.set(null);
+            }
+        });
+        this.steering = new SnakeSteering(snake, () -> {
+            Platform.runLater(root::requestFocus);
+            final var gameEvent = event.get();
+            event.set(null);
+            return gameEvent;
         });
         boardView.bind(board);
         timer.run();
