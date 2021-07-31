@@ -58,7 +58,7 @@ public class SnakeGame extends Application {
 
     private void startGame() {
         var snake = new Snake(Pair.of(7, 7));
-        var timer = new Timer(snake, board);
+        timer = new Timer(snake, board);
         ptsLabel.textProperty().unbind();
         ptsLabel.textProperty().bind(timer.pointsProperty());
         var event = new AtomicReference<GameEvent>();
@@ -86,7 +86,6 @@ public class SnakeGame extends Application {
     private void initSteeringByKeyboard(AtomicReference<GameEvent> event) {
         scene.setOnKeyPressed(keyEvent -> {
             final var code = keyEvent.getCode();
-            if (!code.isArrowKey()) return;
             switch (code) {
                 case UP:
                     event.set(TURN_TOP);
@@ -101,10 +100,14 @@ public class SnakeGame extends Application {
                     event.set(TURN_LEFT);
                     break;
                 default:
-                    event.set(null);
                     break;
             }
         });
     }
 
+    @Override public void stop() {
+        steering.executor().shutdownNow();
+        timer.executor().shutdownNow();
+        System.exit(0);
+    }
 }
