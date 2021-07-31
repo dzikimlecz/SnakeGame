@@ -18,6 +18,12 @@ public class Timer implements Runnable {
     private final ScheduledExecutorService executor;
     private final Snake snake;
     private final GameBoard board;
+
+    public SimpleStringProperty pointsProperty() {
+        return points;
+    }
+
+    private final SimpleStringProperty points;
     private @Nullable Runnable onGameEnd;
     private @Nullable Future<?> mainTask;
 
@@ -25,6 +31,7 @@ public class Timer implements Runnable {
         this.snake = snake;
         this.board = board;
         executor = Executors.newSingleThreadScheduledExecutor();
+        points = new SimpleStringProperty();
     }
 
     public void run() {
@@ -39,7 +46,8 @@ public class Timer implements Runnable {
             } catch (SnakeDeadException e) {
                 stop(true);
             }
-        }, 3000, 300, MILLISECONDS);
+            runLater(() -> points.set(snake.size() + " pts"));
+        }, 1000, 200, MILLISECONDS);
     }
 
     public void stop(boolean runEnd) {

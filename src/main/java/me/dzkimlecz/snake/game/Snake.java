@@ -21,6 +21,10 @@ public class Snake {
         body.addFirst(location);
     }
 
+    public int size() {
+        return body.size();
+    }
+
     public void turn(Direction direction) {
         if (!direction.isOppositeTo(this.direction.get()))
             this.direction.set(direction);

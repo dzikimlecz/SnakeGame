@@ -29,8 +29,10 @@ public class SnakeGame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        root = (boardView = new BoardView());
-        primaryStage.setScene(new Scene(root));
+        root = new BorderPane();
+        root.setTop(ptsLabel = new Label());
+        root.setCenter(boardView = new BoardView());
+        primaryStage.setScene(scene = new Scene(root));
         primaryStage.sizeToScene();
         primaryStage.show();
         initGame();
@@ -47,8 +49,8 @@ public class SnakeGame extends Application {
     private void startGame() {
         var snake = new Snake(Pair.of(7, 7));
         var timer = new Timer(snake, board);
-//        ptsLabel.textProperty().unbind();
-//        ptsLabel.textProperty().bind(timer.pointsProperty());
+        ptsLabel.textProperty().unbind();
+        ptsLabel.textProperty().bind(timer.pointsProperty());
         var event = new AtomicReference<GameEvent>();
         boardView.setOnKeyPressed(keyEvent -> {
             final var code = keyEvent.getCode();
