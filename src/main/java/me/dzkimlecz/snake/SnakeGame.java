@@ -72,7 +72,9 @@ public class SnakeGame extends Application {
         timer.setOnGameEnd(() -> {
             runLater(() -> {
                 boardView.setOnKeyPressed(keyEvent -> {});
-                root.setCenter(new Label("Game over!"));
+                final var label = new Label("Game over!");
+                label.setFont(font(25));
+                root.setCenter(label);
             });
             steering.stop();
         });
