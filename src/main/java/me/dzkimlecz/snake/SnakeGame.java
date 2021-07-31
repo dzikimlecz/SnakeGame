@@ -108,7 +108,11 @@ public class SnakeGame extends Application {
     }
 
     @Override public void stop() {
+        if (!steering.executor().isShutdown())
+            System.err.println("Steering: ON");
         steering.executor().shutdownNow();
+        if (!timer.executor().isShutdown())
+            System.err.println("Timer: ON");
         timer.executor().shutdownNow();
         System.exit(0);
     }
