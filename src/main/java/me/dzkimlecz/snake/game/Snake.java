@@ -2,9 +2,7 @@ package me.dzkimlecz.snake.game;
 
 import me.dzkimlecz.snake.util.Pair;
 
-import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -12,6 +10,7 @@ import static me.dzkimlecz.snake.game.Direction.*;
 
 public class Snake {
     private final Deque<Pair<Integer>> body;
+    private final Deque<Direction> turns;
     private final AtomicReference<Direction> direction;
     private final AtomicReference<Pair<Integer>> leftSquare = new AtomicReference<>();
 
@@ -19,6 +18,7 @@ public class Snake {
         direction = new AtomicReference<>(TOP);
         body = new LinkedList<>();
         body.addFirst(location);
+        turns = new ArrayDeque<>(3);
     }
 
     public int size() {
@@ -26,12 +26,18 @@ public class Snake {
     }
 
     public void turn(Direction direction) {
-        if (!direction.isOppositeTo(this.direction.get()))
-            this.direction.set(direction);
+        var lastDir = Objects.requireNonNullElse(turns.peekLast(), this.direction.get());
+        if (!direction.isOppositeTo(lastDir) && !direction.equals(lastDir)) {
+            if (turns.size() == 3) turns.removeFirst();
+            turns.addLast(direction);
+        }
     }
 
     public synchronized void move() {
-        final var direction = this.direction.get();
+        final var head = body.getFirst();
+        leftSquare.set(body.removeLast());
+        final var direction = turns.isEmpty() ? this.direction.get() : turns.pollFirst();
+        this.direction.set(direction);
         final Pair<Integer> delta;
         switch (direction) {
             case TOP:
@@ -49,8 +55,6 @@ public class Snake {
             default:
                 throw new AssertionError();
         }
-        final var head = body.getFirst();
-        leftSquare.set(body.removeLast());
         final var newHead = Pair.of(head.first() + delta.first(), head.second() + delta.second());
         body.addFirst(newHead);
     }
@@ -63,8 +67,7 @@ public class Snake {
     }
 
     public boolean overlaysItself() {
-        if (body.stream().filter(e -> e.equals(body.getFirst())).count() > 1) return true;
-        else return body.stream().distinct().count() < body.size();
+        return body.stream().distinct().count() < body.size();
     }
 
     public Pair<Integer> headLocation() {
