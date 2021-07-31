@@ -43,10 +43,10 @@ public class Timer implements Runnable {
             snake.move();
             try {
                 board.update(snake);
+                runLater(() -> points.set(snake.size() + " pts"));
             } catch (SnakeDeadException e) {
                 stop(true);
             }
-            runLater(() -> points.set(snake.size() + " pts"));
         }, 1000, 200, MILLISECONDS);
     }
 
