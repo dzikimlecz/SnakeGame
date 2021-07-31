@@ -48,10 +48,10 @@ public class SnakeGame extends Application {
     }
 
     private void initNewGame() {
-        root.setCenter(boardView);
         board = new GameBoard(15);
         scene.setOnKeyPressed(event -> {
             scene.setOnKeyPressed(e1 -> {});
+            root.setCenter(boardView);
             startGame();
         });
     }
@@ -64,19 +64,19 @@ public class SnakeGame extends Application {
         var event = new AtomicReference<GameEvent>();
         initSteeringByKeyboard(event);
         this.steering = new SnakeSteering(snake, () -> {
-            runLater(boardView::requestFocus);
             final var gameEvent = event.get();
             event.set(null);
             return gameEvent;
         });
         timer.setOnGameEnd(() -> {
+            steering.stop();
             runLater(() -> {
                 boardView.setOnKeyPressed(keyEvent -> {});
                 final var label = new Label("Game over!");
                 label.setFont(font(25));
                 root.setCenter(label);
             });
-            steering.stop();
+            initNewGame();
         });
         boardView.bind(board);
         requestNextPulse();
