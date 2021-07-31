@@ -43,15 +43,15 @@ public class GameBoard {
      * generates new apples, and puts one on the board.
      */
     public void tick() {
-        //makes sure that there will be at least 3 apples in reserve, but also not more than 5
-        if (newApples.size() < 5) do {
+        //makes sure that there will be at least 2 apples in reserve, but also not more than 4
+        if (newApples.size() < 4) do {
             newApples.offer(Pair.of(rand(size), rand(size)));
-        } while(newApples.size() < 3);
+        } while(newApples.size() < 2);
 
-        // spawns apple if there are less than a third of the limit,
-        // or else if the limit hasn't been surpassed yet, spawns apple on a chance of 1 to 5
-        if ((applesOnBoard.size() < (maxApples / 3)) ||
-                ((applesOnBoard.size() < maxApples) && (rand(5) == 0))) {
+        // spawns apple if there are less than a fifth of the limit,
+        // or else if the limit hasn't been surpassed yet, spawns apple on a chance of 1 to 25
+        if ((applesOnBoard.size() < (maxApples / 5)) ||
+                ((applesOnBoard.size() < maxApples) && (rand(25) == 0))) {
             Pair<Integer> newLocation;
             // polls new apple location from the reserve
             do {
