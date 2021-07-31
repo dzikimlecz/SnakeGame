@@ -52,6 +52,28 @@ public class SnakeGame extends Application {
         ptsLabel.textProperty().unbind();
         ptsLabel.textProperty().bind(timer.pointsProperty());
         var event = new AtomicReference<GameEvent>();
+        initSteeringByKeyboard(event);
+        this.steering = new SnakeSteering(snake, () -> {
+            runLater(boardView::requestFocus);
+            final var gameEvent = event.get();
+            event.set(null);
+            return gameEvent;
+        });
+        timer.setOnGameEnd(() -> {
+            runLater(() -> {
+                boardView.setOnKeyPressed(keyEvent -> {});
+                root.setCenter(new Label("Game over!"));
+            });
+            steering.stop();
+        });
+        boardView.bind(board);
+        requestNextPulse();
+        boardView.requestLayout();
+        timer.run();
+        steering.run();
+    }
+
+    private void initSteeringByKeyboard(AtomicReference<GameEvent> event) {
         boardView.setOnKeyPressed(keyEvent -> {
             final var code = keyEvent.getCode();
             if (!code.isArrowKey()) return;
@@ -73,24 +95,6 @@ public class SnakeGame extends Application {
                     break;
             }
         });
-        this.steering = new SnakeSteering(snake, () -> {
-            runLater(boardView::requestFocus);
-            final var gameEvent = event.get();
-            event.set(null);
-            return gameEvent;
-        });
-        timer.setOnGameEnd(() -> {
-            runLater(() -> {
-                boardView.setOnKeyPressed(keyEvent -> {});
-                root.setCenter(new Label("Game over!"));
-            });
-            steering.stop();
-        });
-        boardView.bind(board);
-        requestNextPulse();
-        boardView.requestLayout();
-        timer.run();
-        steering.run();
     }
 
 }
