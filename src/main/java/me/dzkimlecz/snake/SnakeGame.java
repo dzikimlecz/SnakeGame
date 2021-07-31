@@ -1,8 +1,9 @@
 package me.dzkimlecz.snake;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import me.dzkimlecz.snake.components.BoardView;
 import me.dzkimlecz.snake.controller.GameEvent;
@@ -14,13 +15,17 @@ import me.dzkimlecz.snake.util.Pair;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import static javafx.application.Platform.requestNextPulse;
+import static javafx.application.Platform.runLater;
 import static me.dzkimlecz.snake.controller.GameEvent.*;
 
 public class SnakeGame extends Application {
+    private Scene scene;
+    private GameBoard board;
     private BoardView boardView;
-    private Timer timer;
     private SnakeSteering steering;
-    private BoardView root;
+    private BorderPane root;
+    private Label ptsLabel;
 
     @Override
     public void start(Stage primaryStage) {
@@ -28,15 +33,24 @@ public class SnakeGame extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.sizeToScene();
         primaryStage.show();
-        startGame();
+        initGame();
     }
 
-    public void startGame() {
+    private void initGame() {
+        board = new GameBoard(15);
+        scene.setOnKeyPressed(event -> {
+            scene.setOnKeyPressed(e1 -> {});
+            startGame();
+        });
+    }
+
+    private void startGame() {
         var snake = new Snake(Pair.of(7, 7));
-        var board = new GameBoard(15);
-        timer = new Timer(snake, board);
-        AtomicReference<GameEvent> event = new AtomicReference<>();
-        root.setOnKeyPressed(keyEvent -> {
+        var timer = new Timer(snake, board);
+//        ptsLabel.textProperty().unbind();
+//        ptsLabel.textProperty().bind(timer.pointsProperty());
+        var event = new AtomicReference<GameEvent>();
+        boardView.setOnKeyPressed(keyEvent -> {
             final var code = keyEvent.getCode();
             if (!code.isArrowKey()) return;
             switch (code) {
@@ -54,20 +68,25 @@ public class SnakeGame extends Application {
                     break;
                 default:
                     event.set(null);
+                    break;
             }
         });
         this.steering = new SnakeSteering(snake, () -> {
-            Platform.runLater(root::requestFocus);
+            runLater(boardView::requestFocus);
             final var gameEvent = event.get();
             event.set(null);
             return gameEvent;
         });
         timer.setOnGameEnd(() -> {
-            timer.stop();
+            runLater(() -> {
+                boardView.setOnKeyPressed(keyEvent -> {});
+                root.setCenter(new Label("Game over!"));
+            });
             steering.stop();
-            root.setOnKeyPressed(keyEvent -> {});
         });
         boardView.bind(board);
+        requestNextPulse();
+        boardView.requestLayout();
         timer.run();
         steering.run();
     }

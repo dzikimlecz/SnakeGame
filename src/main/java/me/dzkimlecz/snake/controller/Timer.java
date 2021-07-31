@@ -1,5 +1,6 @@
 package me.dzkimlecz.snake.controller;
 
+import javafx.beans.property.SimpleStringProperty;
 import me.dzkimlecz.snake.game.GameBoard;
 import me.dzkimlecz.snake.game.Snake;
 import me.dzkimlecz.snake.game.SnakeDeadException;
@@ -7,15 +8,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static javafx.application.Platform.runLater;
 
 public class Timer implements Runnable {
     private final ScheduledExecutorService executor;
     private final Snake snake;
     private final GameBoard board;
     private @Nullable Runnable onGameEnd;
+    private @Nullable Future<?> mainTask;
 
     public Timer(Snake snake, GameBoard board) {
         this.snake = snake;
@@ -27,20 +31,22 @@ public class Timer implements Runnable {
         if (executor.isShutdown())
             throw new IllegalStateException("Can't use the same timer object more than once");
 
-        executor.scheduleWithFixedDelay(() -> {
+        mainTask = executor.scheduleWithFixedDelay(() -> {
             board.tick();
             snake.move();
             try {
                 board.update(snake);
             } catch (SnakeDeadException e) {
-                executor.shutdownNow();
-                if (onGameEnd != null) onGameEnd.run();
+                stop(true);
             }
         }, 3000, 300, MILLISECONDS);
     }
 
-    public void stop() {
-        executor.shutdownNow();
+    public void stop(boolean runEnd) {
+        if (mainTask != null) mainTask.cancel(true);
+        if (runEnd && onGameEnd != null)
+            executor.execute(onGameEnd);
+        executor.shutdown();
     }
 
     public void setOnGameEnd(@NotNull Runnable onGameEnd) {
