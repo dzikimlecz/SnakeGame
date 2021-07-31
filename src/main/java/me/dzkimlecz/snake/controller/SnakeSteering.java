@@ -1,6 +1,7 @@
 package me.dzkimlecz.snake.controller;
 
 import me.dzkimlecz.snake.game.Snake;
+import me.dzkimlecz.snake.util.ExecutorControl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutorService;

@@ -4,11 +4,10 @@ import javafx.beans.property.SimpleStringProperty;
 import me.dzkimlecz.snake.game.GameBoard;
 import me.dzkimlecz.snake.game.Snake;
 import me.dzkimlecz.snake.game.SnakeDeadException;
+import me.dzkimlecz.snake.util.ExecutorControl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.*;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;

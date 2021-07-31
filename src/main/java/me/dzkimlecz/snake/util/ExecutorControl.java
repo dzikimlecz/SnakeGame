@@ -1,4 +1,4 @@
-package me.dzkimlecz.snake.controller;
+package me.dzkimlecz.snake.util;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
  *  Class providing all functionalities of ExecutorService <b>except of executing and scheduling tasks</b>.
  *  Used to control executor from outside the object
  */
-class ExecutorControl implements ExecutorService {
+public class ExecutorControl implements ExecutorService {
     private final ExecutorService controlled;
 
-    ExecutorControl(ExecutorService controlled) {
+    public ExecutorControl(ExecutorService controlled) {
         this.controlled = controlled;
     }
 
