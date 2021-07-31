@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import me.dzkimlecz.snake.components.BoardView;
@@ -14,6 +15,8 @@ import me.dzkimlecz.snake.game.GameBoard;
 import me.dzkimlecz.snake.game.Snake;
 import me.dzkimlecz.snake.util.Pair;
 
+import java.io.File;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static javafx.application.Platform.requestNextPulse;
@@ -30,6 +33,7 @@ public class SnakeGame extends Application {
     private BorderPane root;
     private Label ptsLabel;
     private Timer timer;
+    private AtomicReference<GameEvent> steeringEvent;
 
     @Override public void start(Stage primaryStage) {
         primaryStage.setTitle("Snaaaaaaaakkeeeeeeeee");
@@ -61,23 +65,10 @@ public class SnakeGame extends Application {
         timer = new Timer(snake, board);
         ptsLabel.textProperty().unbind();
         ptsLabel.textProperty().bind(timer.pointsProperty());
-        var event = new AtomicReference<GameEvent>();
-        initSteeringByKeyboard(event);
-        this.steering = new SnakeSteering(snake, () -> {
-            final var gameEvent = event.get();
-            event.set(null);
-            return gameEvent;
-        });
-        timer.setOnGameEnd(() -> {
-            steering.stop();
-            runLater(() -> {
-                boardView.setOnKeyPressed(keyEvent -> {});
-                final var label = new Label("Game over!");
-                label.setFont(font(25));
-                root.setCenter(label);
-            });
-            initNewGame();
-        });
+        steeringEvent = new AtomicReference<>();
+        initSteeringByKeyboard();
+        this.steering = new SnakeSteering(snake, this::takeEvent);
+        timer.setOnGameEnd(this::displayEndScreen);
         boardView.bind(board);
         requestNextPulse();
         boardView.requestLayout();
@@ -85,21 +76,21 @@ public class SnakeGame extends Application {
         steering.run();
     }
 
-    private void initSteeringByKeyboard(AtomicReference<GameEvent> event) {
+    private void initSteeringByKeyboard() {
         scene.setOnKeyPressed(keyEvent -> {
             final var code = keyEvent.getCode();
             switch (code) {
                 case UP:
-                    event.set(TURN_TOP);
+                    steeringEvent.set(TURN_TOP);
                     break;
                 case DOWN:
-                    event.set(TURN_BOTTOM);
+                    steeringEvent.set(TURN_BOTTOM);
                     break;
                 case RIGHT:
-                    event.set(TURN_RIGHT);
+                    steeringEvent.set(TURN_RIGHT);
                     break;
                 case LEFT:
-                    event.set(TURN_LEFT);
+                    steeringEvent.set(TURN_LEFT);
                     break;
                 default:
                     break;
@@ -107,7 +98,26 @@ public class SnakeGame extends Application {
         });
     }
 
+    private void displayEndScreen() {
+        steering.stop();
+        runLater(() -> {
+            boardView.setOnKeyPressed(keyEvent -> {
+            });
+            final var label = new Label("Game over!");
+            label.setFont(font(25));
+            root.setCenter(label);
+        });
+        initNewGame();
+    }
+
+    private GameEvent takeEvent() {
+        final var gameEvent = steeringEvent.get();
+        steeringEvent.set(null);
+        return gameEvent;
+    }
+
     @Override public void stop() {
+        System.out.println();
         if (!steering.executor().isShutdown())
             System.err.println("Steering: ON");
         steering.executor().shutdownNow();
