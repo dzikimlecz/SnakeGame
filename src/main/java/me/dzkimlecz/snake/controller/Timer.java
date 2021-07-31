@@ -47,7 +47,7 @@ public class Timer implements Runnable {
             } catch (SnakeDeadException e) {
                 stop(true);
             }
-        }, 1000, 200, MILLISECONDS);
+        }, 500, 200, MILLISECONDS);
     }
 
     public void stop(boolean runEnd) {
