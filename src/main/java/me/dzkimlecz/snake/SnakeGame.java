@@ -1,6 +1,7 @@
 package me.dzkimlecz.snake;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static javafx.application.Platform.requestNextPulse;
 import static javafx.application.Platform.runLater;
+import static javafx.scene.layout.BorderPane.setMargin;
 import static me.dzkimlecz.snake.controller.GameEvent.*;
 
 public class SnakeGame extends Application {
@@ -29,16 +31,21 @@ public class SnakeGame extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        root = new BorderPane();
-        root.setTop(ptsLabel = new Label());
-        root.setCenter(boardView = new BoardView());
-        primaryStage.setScene(scene = new Scene(root));
-        primaryStage.sizeToScene();
+        primaryStage.setTitle("Snaaaaaaaakkeeeeeeeee");
+        primaryStage.setWidth(1300);
+        primaryStage.setHeight(1000);
+        primaryStage.setResizable(false);
+        primaryStage.setScene(scene = new Scene(root = new BorderPane()));
         primaryStage.show();
-        initGame();
+        primaryStage.centerOnScreen();
+        root.setTop(ptsLabel = new Label());
+        boardView = new BoardView();
+        setMargin(boardView, new Insets(50, 250, 0, 250));
+        initNewGame();
     }
 
-    private void initGame() {
+    private void initNewGame() {
+        root.setCenter(boardView);
         board = new GameBoard(15);
         scene.setOnKeyPressed(event -> {
             scene.setOnKeyPressed(e1 -> {});
@@ -74,7 +81,7 @@ public class SnakeGame extends Application {
     }
 
     private void initSteeringByKeyboard(AtomicReference<GameEvent> event) {
-        boardView.setOnKeyPressed(keyEvent -> {
+        scene.setOnKeyPressed(keyEvent -> {
             final var code = keyEvent.getCode();
             if (!code.isArrowKey()) return;
             switch (code) {

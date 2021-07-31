@@ -1,5 +1,6 @@
 package me.dzkimlecz.snake.components;
 
+import javafx.geometry.Insets;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
@@ -23,8 +24,8 @@ public class BoardView extends StackPane {
         for (int row = 0; row < size; row++) {
             for (int column = 0; column < size; column++) {
                 final var rectangle = new Rectangle();
-                rectangle.setHeight(1E3 / size);
-                rectangle.setWidth(1E3 / size);
+                rectangle.setHeight(8E2 / size);
+                rectangle.setWidth(8E2 / size);
                 rectangle.setFill(LIGHTGREY);
                 displayPane.add(rectangle, column, row);
                 board.squareStateProperty(column, row).addListener((obs, oldVal, newVal) -> {
