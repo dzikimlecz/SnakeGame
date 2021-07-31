@@ -20,75 +20,61 @@ class ExecutorControl implements ExecutorService {
         this.controlled = controlled;
     }
 
-    @Override
-    public void shutdown() {
+    @Override public void shutdown() {
         controlled.shutdown();
     }
 
-    @NotNull
-    @Override
-    public List<Runnable> shutdownNow() {
+
+    @Override public @NotNull List<Runnable> shutdownNow() {
         return controlled.shutdownNow();
     }
 
-    @Override
-    public boolean isShutdown() {
+    @Override public boolean isShutdown() {
         return controlled.isShutdown();
     }
 
-    @Override
-    public boolean isTerminated() {
+    @Override public boolean isTerminated() {
         return controlled.isTerminated();
     }
 
-    @Override
-    public boolean awaitTermination(long timeout, @NotNull TimeUnit unit) throws InterruptedException {
+    @Override public boolean awaitTermination(long timeout, @NotNull TimeUnit unit) throws InterruptedException {
         return controlled.awaitTermination(timeout, unit);
     }
 
-    @NotNull
-    @Override
-    public <T> Future<T> submit(@NotNull Callable<T> task) {
+    @Override public <T> @NotNull Future<T> submit(@NotNull Callable<T> task) {
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    @Override
-    public <T> Future<T> submit(@NotNull Runnable task, T result) {
+
+    @Override public <T> @NotNull Future<T> submit(@NotNull Runnable task, T result) {
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    @Override
-    public Future<?> submit(@NotNull Runnable task) {
+
+    @Override public @NotNull Future<?> submit(@NotNull Runnable task) {
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    @Override
-    public <T> List<Future<T>> invokeAll(@NotNull Collection<? extends Callable<T>> tasks) {
+
+    @Override public <T> @NotNull List<Future<T>> invokeAll(@NotNull Collection<? extends Callable<T>> tasks) {
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    @Override
-    public <T> List<Future<T>> invokeAll(@NotNull Collection<? extends Callable<T>> tasks, long timeout, @NotNull TimeUnit unit) {
+
+    @Override public <T> @NotNull List<Future<T>> invokeAll(@NotNull Collection<? extends Callable<T>> tasks, long timeout, @NotNull TimeUnit unit) {
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    @Override
-    public <T> T invokeAny(@NotNull Collection<? extends Callable<T>> tasks) {
+
+    @Override public <T> @NotNull T invokeAny(@NotNull Collection<? extends Callable<T>> tasks) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public <T> T invokeAny(@NotNull Collection<? extends Callable<T>> tasks, long timeout, @NotNull TimeUnit unit) {
+    @Override public <T> T invokeAny(@NotNull Collection<? extends Callable<T>> tasks, long timeout, @NotNull TimeUnit unit) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void execute(@NotNull Runnable command) {
+    @Override public void execute(@NotNull Runnable command) {
         throw new UnsupportedOperationException();
     }
 

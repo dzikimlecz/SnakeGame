@@ -21,21 +21,18 @@ public final class Pair<E> implements Collection<E> {
         return new Pair<>(e, e1);
     }
 
-    @Override
-    public boolean equals(Object o) {
+    @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Pair)) return false;
         Pair<?> pair = (Pair<?>) o;
         return first.equals(pair.first) && second.equals(pair.second);
     }
 
-    @Override
-    public String toString() {
+    @Override public String toString() {
         return "{" + first + " to " + second + "}";
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return Objects.hash(first, second);
     }
 
@@ -47,32 +44,26 @@ public final class Pair<E> implements Collection<E> {
         return second;
     }
 
-    @Override
-    public int size() {
+    @Override public int size() {
         return 2;
     }
 
-    @Override
-    public boolean isEmpty() {
+    @Override public boolean isEmpty() {
         return false;
     }
 
-    @Override
-    public boolean contains(Object o) {
+    @Override public boolean contains(Object o) {
         return first.equals(o) || second.equals(o);
     }
 
-    @Override
-    public @NotNull Iterator<E> iterator() {
+    @Override public @NotNull Iterator<E> iterator() {
         return new Iterator<>() {
             private final AtomicInteger cursor = new AtomicInteger(-1);
-            @Override
-            public boolean hasNext() {
+            @Override public boolean hasNext() {
                 return cursor.get() != 1;
             }
 
-            @Override
-            public E next() {
+            @Override public E next() {
                 switch(cursor.incrementAndGet()) {
                     case 0:
                         return first;
@@ -86,13 +77,11 @@ public final class Pair<E> implements Collection<E> {
         };
     }
 
-    @Override
-    public Object[] toArray() {
+    @Override public Object[] toArray() {
         return content;
     }
 
-    @Override
-    public <T> T @NotNull [] toArray(T @NotNull [] a) {
+    @Override public <T> T @NotNull [] toArray(T @NotNull [] a) {
         if (a.length < 2) {
             try {
                 @SuppressWarnings("unchecked")
@@ -108,38 +97,31 @@ public final class Pair<E> implements Collection<E> {
         return a;
     }
 
-    @Override
-    public boolean containsAll(Collection<?> c) {
+    @Override public boolean containsAll(Collection<?> c) {
         return c.stream().allMatch(this::contains);
     }
 
-    @Override
-    public boolean add(E e) {
+    @Override public boolean add(E e) {
         throw new UnsupportedOperationException("Pairs are immutable");
     }
 
-    @Override
-    public boolean remove(Object o) {
+    @Override public boolean remove(Object o) {
         throw new UnsupportedOperationException("Pairs are immutable");
     }
 
-    @Override
-    public boolean addAll(@NotNull Collection<? extends E> c) {
+    @Override public boolean addAll(@NotNull Collection<? extends E> c) {
         throw new UnsupportedOperationException("Pairs are immutable");
     }
 
-    @Override
-    public boolean removeAll(@NotNull Collection<?> c) {
+    @Override public boolean removeAll(@NotNull Collection<?> c) {
         throw new UnsupportedOperationException("Pairs are immutable");
     }
 
-    @Override
-    public boolean retainAll(@NotNull Collection<?> c) {
+    @Override public boolean retainAll(@NotNull Collection<?> c) {
         throw new UnsupportedOperationException("Pairs are immutable");
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         throw new UnsupportedOperationException("Pairs are immutable");
     }
 

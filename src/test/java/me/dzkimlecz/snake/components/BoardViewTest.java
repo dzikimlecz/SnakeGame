@@ -52,8 +52,7 @@ class BoardViewTest {
     }
 
     public static class test extends Application {
-        @Override
-        public void start(Stage primaryStage) {
+        @Override public void start(Stage primaryStage) {
             primaryStage.setScene(new Scene(boardView));
             primaryStage.show();
         }
