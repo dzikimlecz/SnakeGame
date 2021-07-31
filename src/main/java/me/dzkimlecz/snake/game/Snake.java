@@ -33,7 +33,7 @@ public class Snake {
         }
     }
 
-    public synchronized void move() {
+    public void move() {
         final var head = body.getFirst();
         leftSquare.set(body.removeLast());
         final var direction = turns.isEmpty() ? this.direction.get() : turns.pollFirst();
