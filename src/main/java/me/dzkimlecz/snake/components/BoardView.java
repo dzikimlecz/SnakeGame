@@ -23,8 +23,8 @@ public class BoardView extends StackPane {
         for (int row = 0; row < size; row++) {
             for (int column = 0; column < size; column++) {
                 final var rectangle = new Rectangle();
-                rectangle.setHeight(50);
-                rectangle.setWidth(50);
+                rectangle.setHeight(1E3 / size);
+                rectangle.setWidth(1E3 / size);
                 rectangle.setFill(LIGHTGREY);
                 displayPane.add(rectangle, column, row);
                 board.squareStateProperty(column, row).addListener((obs, oldVal, newVal) -> {
