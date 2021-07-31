@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static javafx.application.Platform.requestNextPulse;
 import static javafx.application.Platform.runLater;
 import static javafx.scene.layout.BorderPane.setMargin;
+import static javafx.scene.text.Font.font;
 import static me.dzkimlecz.snake.controller.GameEvent.*;
 
 public class SnakeGame extends Application {
@@ -28,9 +29,9 @@ public class SnakeGame extends Application {
     private SnakeSteering steering;
     private BorderPane root;
     private Label ptsLabel;
+    private Timer timer;
 
-    @Override
-    public void start(Stage primaryStage) {
+    @Override public void start(Stage primaryStage) {
         primaryStage.setTitle("Snaaaaaaaakkeeeeeeeee");
         primaryStage.setWidth(1300);
         primaryStage.setHeight(1000);
@@ -39,8 +40,10 @@ public class SnakeGame extends Application {
         primaryStage.show();
         primaryStage.centerOnScreen();
         root.setTop(ptsLabel = new Label());
+        setMargin(ptsLabel, new Insets(40, 0, 0, 250));
+        ptsLabel.setFont(font(25));
         boardView = new BoardView();
-        setMargin(boardView, new Insets(50, 250, 0, 250));
+        setMargin(boardView, new Insets(10, 250, 0, 250));
         initNewGame();
     }
 
