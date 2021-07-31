@@ -9,12 +9,11 @@ public final class Pair<E> implements Collection<E> {
 
     private final E first;
     private final E second;
-    private final Object[] content;
+    private Object[] content;
 
     private Pair(E first, E second) {
         this.first = first;
         this.second = second;
-        content = new Object[] {first, second};
     }
 
     public static <T> Pair<T> of(@NotNull T e, @NotNull T e1) {
@@ -78,20 +77,20 @@ public final class Pair<E> implements Collection<E> {
     }
 
     @Override public Object[] toArray() {
-        return content;
+        return Objects.requireNonNullElseGet(content, () -> (content = new Object[]{first, second}));
     }
 
     @Override public <T> T @NotNull [] toArray(T @NotNull [] a) {
         if (a.length < 2) {
             try {
                 @SuppressWarnings("unchecked")
-                final var content = (T[]) Arrays.copyOf(this.content, 2, a.getClass());
+                final var content = (T[]) Arrays.copyOf(toArray(), 2, a.getClass());
                 return content;
             } catch (ClassCastException e) {
                 throw new ArrayStoreException("Can't store content in array of this type.");
             }
         }
-        System.arraycopy(content, 0, a, 0, 2);
+        System.arraycopy(toArray(), 0, a, 0, 2);
         if (a.length > 2)
             a[2] = null;
         return a;
