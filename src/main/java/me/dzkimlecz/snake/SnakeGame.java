@@ -37,6 +37,7 @@ public class SnakeGame extends Application {
 
     @Override public void start(Stage primaryStage) {
         primaryStage.setTitle("Snaaaaaaaakkeeeeeeeee");
+        primaryStage.getIcons().add(new Image("icon.png"));
         primaryStage.setWidth(1300);
         primaryStage.setHeight(1000);
         primaryStage.setResizable(false);
