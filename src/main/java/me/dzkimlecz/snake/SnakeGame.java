@@ -1,6 +1,9 @@
 package me.dzkimlecz.snake;
 
 import javafx.application.Application;
+import javafx.beans.binding.Binding;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -21,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static javafx.application.Platform.requestNextPulse;
 import static javafx.application.Platform.runLater;
+import static javafx.beans.binding.StringExpression.stringExpression;
 import static javafx.scene.layout.BorderPane.setMargin;
 import static javafx.scene.text.Font.font;
 import static me.dzkimlecz.snake.controller.GameEvent.*;
@@ -60,11 +64,11 @@ public class SnakeGame extends Application {
         var top = new HBox();
         top.setSpacing(20);
         root.setTop(top);
-        top.getChildren().addAll(ptsLabel = new Label(), highscoreLabel = new Label());
+        top.getChildren().addAll(ptsLabel = new Label("0 pts"), highscoreLabel = new Label("Highscore: 0 pts"));
         setMargin(top, new Insets(40, 0, 0, 250));
         ptsLabel.setFont(font(25));
         highscoreLabel.setFont(font(25));
-        highscore.addListener((obs, old, newValue) -> highscoreLabel.setText("Highscore: " + newValue + " pts"));
+        highscoreLabel.textProperty().bind(Bindings.concat("Highscore: ", highscore, " pts"));
         boardView = new BoardView();
         setMargin(boardView, new Insets(10, 250, 0, 250));
         initNewGame();
