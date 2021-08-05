@@ -110,8 +110,7 @@ public class SnakeGame extends Application {
     private void displayEndScreen() {
         steering.stop();
         runLater(() -> {
-            boardView.setOnKeyPressed(keyEvent -> {
-            });
+            boardView.setOnKeyPressed(keyEvent -> {});
             final var label = new Label("Game over!");
             label.setFont(font(25));
             root.setCenter(label);
@@ -127,12 +126,16 @@ public class SnakeGame extends Application {
 
     @Override public void stop() {
         System.out.println();
-        if (!steering.executor().isShutdown())
-            System.err.println("Steering: ON");
-        steering.executor().shutdownNow();
-        if (!timer.executor().isShutdown())
-            System.err.println("Timer: ON");
-        timer.executor().shutdownNow();
+        if (steering != null) {
+            if (!steering.executor().isShutdown())
+                System.err.println("Steering: ON");
+            steering.executor().shutdownNow();
+        }
+        if (timer != null) {
+            if (!timer.executor().isShutdown())
+                System.err.println("Timer: ON");
+            timer.executor().shutdownNow();
+        }
         System.exit(0);
     }
 }
