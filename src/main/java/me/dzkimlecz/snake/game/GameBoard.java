@@ -96,7 +96,11 @@ public class GameBoard {
         }
         final var location = snake.bodyLocation();
         // checks if any of the snake segments is out of the board or if it hit itself
-        if (location.stream().anyMatch(xy -> xy.stream().anyMatch(i -> i < 0 || i > size)) || snake.overlaysItself())
+        if (location.stream().anyMatch(xy -> {
+            int x = xy.first();
+            int y = xy.second();
+            return x < 0 || x >= size || y < 0 || y >= size;
+        }) || snake.overlaysItself())
             throw new SnakeDeadException();
         final var headLocation = snake.headLocation();
         // if head was at a location of an apple, snake eats it and grows
