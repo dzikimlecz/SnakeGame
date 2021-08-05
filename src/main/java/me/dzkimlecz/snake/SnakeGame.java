@@ -15,8 +15,6 @@ import me.dzkimlecz.snake.game.GameBoard;
 import me.dzkimlecz.snake.game.Snake;
 import me.dzkimlecz.snake.util.Pair;
 
-import java.io.File;
-import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static javafx.application.Platform.requestNextPulse;
@@ -37,7 +35,13 @@ public class SnakeGame extends Application {
 
     @Override public void start(Stage primaryStage) {
         primaryStage.setTitle("Snaaaaaaaakkeeeeeeeee");
-        primaryStage.getIcons().add(new Image("icon.png"));
+        primaryStage.getIcons().addAll(
+                new Image("icon512.png"),
+                new Image("icon256.png"),
+                new Image("icon128.png"),
+                new Image("icon64.png"),
+                new Image("icon32.png")
+        );
         primaryStage.setWidth(1300);
         primaryStage.setHeight(1000);
         primaryStage.setResizable(false);
