@@ -48,7 +48,7 @@ public class Timer implements Runnable {
         executor = Executors.newSingleThreadScheduledExecutor();
         points = new SimpleIntegerProperty();
         pointsString = new SimpleStringProperty();
-        points.addListener((obs, old, newValue) -> pointsString.set(newValue + " pts"));
+        pointsString.bind(points.asString().concat(" pts"));
     }
 
     public void run() {
@@ -68,7 +68,8 @@ public class Timer implements Runnable {
     }
 
     public void stop(boolean runEnd) {
-        if (mainTask != null) mainTask.cancel(true);
+        if (mainTask != null)
+            mainTask.cancel(true);
         if (runEnd && onGameEnd != null)
             executor.execute(onGameEnd);
         executor.shutdown();
