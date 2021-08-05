@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import me.dzkimlecz.snake.components.BoardView;
 import me.dzkimlecz.snake.controller.GameEvent;
@@ -61,11 +62,15 @@ public class SnakeGame extends Application {
         primaryStage.setScene(scene = new Scene(root = new BorderPane()));
         primaryStage.show();
         primaryStage.centerOnScreen();
+        final var startLabel = new Label("Press any key to start.");
+        startLabel.setFont(font(27));
+        startLabel.setTextFill(Color.GREY);
+        root.setCenter(startLabel);
         var top = new HBox();
+        setMargin(top, new Insets(40, 0, 0, 250));
+        top.getChildren().addAll(ptsLabel = new Label("0 pts"), highscoreLabel = new Label());
         top.setSpacing(20);
         root.setTop(top);
-        top.getChildren().addAll(ptsLabel = new Label("0 pts"), highscoreLabel = new Label("Highscore: 0 pts"));
-        setMargin(top, new Insets(40, 0, 0, 250));
         ptsLabel.setFont(font(25));
         highscoreLabel.setFont(font(25));
         highscoreLabel.textProperty().bind(Bindings.concat("Highscore: ", highscore, " pts"));
@@ -133,7 +138,7 @@ public class SnakeGame extends Application {
         steering.stop();
         runLater(() -> {
             boardView.setOnKeyPressed(keyEvent -> {});
-            final var label = new Label("Game over!");
+            final var label = new Label("Game over! Press any key to continue.");
             if (timer.pointsProperty().get() > highscore.get())
                 highscore.set(timer.pointsProperty().get());
             label.setFont(font(25));
