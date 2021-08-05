@@ -82,15 +82,23 @@ public class SnakeGame extends Application {
             final var code = keyEvent.getCode();
             switch (code) {
                 case UP:
+                case KP_UP:
+                case W:
                     steeringEvent.set(TURN_TOP);
                     break;
                 case DOWN:
+                case KP_DOWN:
+                case S:
                     steeringEvent.set(TURN_BOTTOM);
                     break;
                 case RIGHT:
+                case KP_RIGHT:
+                case D:
                     steeringEvent.set(TURN_RIGHT);
                     break;
                 case LEFT:
+                case KP_LEFT:
+                case A:
                     steeringEvent.set(TURN_LEFT);
                     break;
                 default:
