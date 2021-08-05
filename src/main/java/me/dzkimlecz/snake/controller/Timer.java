@@ -1,5 +1,6 @@
 package me.dzkimlecz.snake.controller;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import me.dzkimlecz.snake.game.GameBoard;
 import me.dzkimlecz.snake.game.Snake;
@@ -14,23 +15,40 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static javafx.application.Platform.runLater;
 
 public class Timer implements Runnable {
+
+    public ExecutorService executor() {
+        return new ExecutorControl(executor);
+    }
     private final ScheduledExecutorService executor;
+
     private final Snake snake;
     private final GameBoard board;
 
-    public SimpleStringProperty pointsProperty() {
+    public SimpleStringProperty pointsStringProperty() {
+        return pointsString;
+    }
+    private final SimpleStringProperty pointsString;
+
+    public SimpleIntegerProperty pointsProperty() {
         return points;
     }
+    private final SimpleIntegerProperty points;
 
-    private final SimpleStringProperty points;
+
+    public void setOnGameEnd(@NotNull Runnable onGameEnd) {
+        this.onGameEnd = onGameEnd;
+    }
     private @Nullable Runnable onGameEnd;
+
     private @Nullable Future<?> mainTask;
 
     public Timer(Snake snake, GameBoard board) {
         this.snake = snake;
         this.board = board;
         executor = Executors.newSingleThreadScheduledExecutor();
-        points = new SimpleStringProperty();
+        points = new SimpleIntegerProperty();
+        pointsString = new SimpleStringProperty();
+        points.addListener((obs, old, newValue) -> pointsString.set(newValue + " pts"));
     }
 
     public void run() {
@@ -42,7 +60,7 @@ public class Timer implements Runnable {
             snake.move();
             try {
                 board.update(snake);
-                runLater(() -> points.set((snake.size() - 1) + " pts"));
+                runLater(() -> points.set(snake.size() - 1));
             } catch (SnakeDeadException e) {
                 stop(true);
             }
@@ -54,14 +72,6 @@ public class Timer implements Runnable {
         if (runEnd && onGameEnd != null)
             executor.execute(onGameEnd);
         executor.shutdown();
-    }
-
-    public void setOnGameEnd(@NotNull Runnable onGameEnd) {
-        this.onGameEnd = onGameEnd;
-    }
-
-    public ExecutorService executor() {
-        return new ExecutorControl(executor);
     }
 
 }

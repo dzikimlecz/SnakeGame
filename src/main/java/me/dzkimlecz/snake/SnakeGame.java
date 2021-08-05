@@ -69,7 +69,7 @@ public class SnakeGame extends Application {
         var snake = new Snake(Pair.of(7, 7));
         timer = new Timer(snake, board);
         ptsLabel.textProperty().unbind();
-        ptsLabel.textProperty().bind(timer.pointsProperty());
+        ptsLabel.textProperty().bind(timer.pointsStringProperty());
         steeringEvent = new AtomicReference<>();
         initSteeringByKeyboard();
         this.steering = new SnakeSteering(snake, this::takeEvent);
