@@ -1,11 +1,13 @@
 package me.dzkimlecz.snake;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import me.dzkimlecz.snake.components.BoardView;
 import me.dzkimlecz.snake.controller.GameEvent;
@@ -30,8 +32,15 @@ public class SnakeGame extends Application {
     private SnakeSteering steering;
     private BorderPane root;
     private Label ptsLabel;
+    private Label highscoreLabel;
     private Timer timer;
-    private AtomicReference<GameEvent> steeringEvent;
+    private final AtomicReference<GameEvent> steeringEvent;
+    private final SimpleIntegerProperty highscore;
+
+    public SnakeGame() {
+        highscore = new SimpleIntegerProperty();
+        steeringEvent = new AtomicReference<>();
+    }
 
     @Override public void start(Stage primaryStage) {
         primaryStage.setTitle("Snaaaaaaaakkeeeeeeeee");
@@ -48,9 +57,14 @@ public class SnakeGame extends Application {
         primaryStage.setScene(scene = new Scene(root = new BorderPane()));
         primaryStage.show();
         primaryStage.centerOnScreen();
-        root.setTop(ptsLabel = new Label());
-        setMargin(ptsLabel, new Insets(40, 0, 0, 250));
+        var top = new HBox();
+        top.setSpacing(20);
+        root.setTop(top);
+        top.getChildren().addAll(ptsLabel = new Label(), highscoreLabel = new Label());
+        setMargin(top, new Insets(40, 0, 0, 250));
         ptsLabel.setFont(font(25));
+        highscoreLabel.setFont(font(25));
+        highscore.addListener((obs, old, newValue) -> highscoreLabel.setText("Highscore: " + newValue + " pts"));
         boardView = new BoardView();
         setMargin(boardView, new Insets(10, 250, 0, 250));
         initNewGame();
@@ -70,7 +84,7 @@ public class SnakeGame extends Application {
         timer = new Timer(snake, board);
         ptsLabel.textProperty().unbind();
         ptsLabel.textProperty().bind(timer.pointsStringProperty());
-        steeringEvent = new AtomicReference<>();
+        steeringEvent.set(null);
         initSteeringByKeyboard();
         this.steering = new SnakeSteering(snake, this::takeEvent);
         timer.setOnGameEnd(this::displayEndScreen);
@@ -116,6 +130,8 @@ public class SnakeGame extends Application {
         runLater(() -> {
             boardView.setOnKeyPressed(keyEvent -> {});
             final var label = new Label("Game over!");
+            if (timer.pointsProperty().get() > highscore.get())
+                highscore.set(timer.pointsProperty().get());
             label.setFont(font(25));
             root.setCenter(label);
         });
