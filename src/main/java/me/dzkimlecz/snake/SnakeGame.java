@@ -1,9 +1,7 @@
 package me.dzkimlecz.snake;
 
 import javafx.application.Application;
-import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringBinding;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -22,10 +20,12 @@ import me.dzkimlecz.snake.game.Snake;
 import me.dzkimlecz.snake.util.Pair;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import static java.util.logging.Level.WARNING;
 import static javafx.application.Platform.requestNextPulse;
 import static javafx.application.Platform.runLater;
-import static javafx.beans.binding.StringExpression.stringExpression;
 import static javafx.scene.layout.BorderPane.setMargin;
 import static javafx.scene.text.Font.font;
 import static me.dzkimlecz.snake.controller.GameEvent.*;
@@ -37,7 +37,6 @@ public class SnakeGame extends Application {
     private SnakeSteering steering;
     private BorderPane root;
     private Label ptsLabel;
-    private Label highscoreLabel;
     private Timer timer;
     private final AtomicReference<GameEvent> steeringEvent;
     private final SimpleIntegerProperty highscore;
@@ -68,7 +67,9 @@ public class SnakeGame extends Application {
         root.setCenter(startLabel);
         var top = new HBox();
         setMargin(top, new Insets(40, 0, 0, 250));
-        top.getChildren().addAll(ptsLabel = new Label("0 pts"), highscoreLabel = new Label());
+        var highscoreLabel = new Label();
+        ptsLabel = new Label("0 pts");
+        top.getChildren().addAll(ptsLabel, highscoreLabel);
         top.setSpacing(20);
         root.setTop(top);
         ptsLabel.setFont(font(25));
@@ -154,15 +155,17 @@ public class SnakeGame extends Application {
     }
 
     @Override public void stop() {
-        System.out.println();
+        var shutdownLogs = Logger.getLogger("Shutdown Logs");
+        shutdownLogs.setLevel(WARNING); // remove in builds
+        shutdownLogs.log(WARNING, "\n");
         if (steering != null) {
             if (!steering.executor().isShutdown())
-                System.err.println("Steering: ON");
+                shutdownLogs.log(WARNING, "Steering: ON");
             steering.executor().shutdownNow();
         }
         if (timer != null) {
             if (!timer.executor().isShutdown())
-                System.err.println("Timer: ON");
+                shutdownLogs.log(WARNING, "Timer: ON");
             timer.executor().shutdownNow();
         }
         System.exit(0);
