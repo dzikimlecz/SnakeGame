@@ -1,12 +1,16 @@
 package me.dzkimlecz.snake.game;
 
 import javafx.beans.property.SimpleObjectProperty;
+import me.dzkimlecz.snake.util.ExecutorControl;
 import me.dzkimlecz.snake.util.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
+import static javafx.application.Platform.runLater;
 import static me.dzkimlecz.snake.game.SquareState.*;
 
 public class GameBoard {
@@ -20,6 +24,13 @@ public class GameBoard {
     private final List<Pair<Integer>> applesOnBoard;
     private final int maxApples;
     private final List<List<SimpleObjectProperty<SquareState>>> squareStateProperties;
+    private final AtomicReference<Snake> snake;
+
+    public ExecutorService executor() {
+        return new ExecutorControl(executor);
+    }
+
+    private final ExecutorService executor;
 
 
     public GameBoard(int size) {
@@ -37,6 +48,8 @@ public class GameBoard {
             for (int j = 0; j < size; j++)
                 squareStateProperties.get(i).add(new SimpleObjectProperty<>(EMPTY));
         }
+        executor = Executors.newSingleThreadExecutor();
+        snake = new AtomicReference<>();
     }
 
     /**
@@ -76,9 +89,6 @@ public class GameBoard {
         return squareStateProperty(xy.first(), xy.second());
     }
 
-    public SquareState getSquareState(int x, int y) {
-        return squareStateProperty(x, y).get();
-    }
 
     /**
      * Sets squares on the board to contain a snake, makes snake grow if it ate an apple.
@@ -86,14 +96,27 @@ public class GameBoard {
      * @throws SnakeDeadException if the snake has extended board limits or has hit itself
      */
     public void update(Snake snake) throws SnakeDeadException {
+        this.snake.set(snake);
+        Callable<Boolean> update = this::updateImpl;
+        final var future = executor.submit(update);
+        try {
+            final var fail = !future.get();
+            if (fail) throw new SnakeDeadException();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean updateImpl() {
         // refreshes whole board
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 final var property = squareStateProperty(j, i);
                 if (property.get() != APPLE)
-                    property.set(EMPTY);
+                    runLater(() -> property.set(EMPTY));
             }
         }
+        var snake = this.snake.get();
         final var location = snake.bodyLocation();
         // checks if any of the snake segments is out of the board or if it hit itself
         if (location.stream().anyMatch(xy -> {
@@ -101,19 +124,24 @@ public class GameBoard {
             int y = xy.second();
             return x < 0 || x >= size || y < 0 || y >= size;
         }) || snake.overlaysItself())
-            throw new SnakeDeadException();
+            return false;
         final var headLocation = snake.headLocation();
         // if head was at a location of an apple, snake eats it and grows
         if (applesOnBoard.remove(headLocation)) snake.grow();
-        squareStateProperty(headLocation).set(SNAKE_HEAD);
-        // marks all the squares containing the snake, except of the head, as the SNAKE_BODY
-        location.stream()
+            runLater(() -> squareStateProperty(headLocation).set(SNAKE_HEAD));
+        // collects all the squares containing the snake, except of the head
+        var squares = location.stream()
                 // excludes head
                 .dropWhile(e -> e.equals(headLocation))
                 // maps to the corresponding square
                 .map(this::squareStateProperty)
                 // marks as a part of the body
-                .forEach(e -> e.set(SNAKE_BODY));
+                .collect(Collectors.toList());
+        // marks them all as SNAKE_BODY
+        runLater(() -> {
+            for (SimpleObjectProperty<SquareState> squareState : squares) squareState.set(SNAKE_BODY);
+        });
+        return true;
     }
 
     /**

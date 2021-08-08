@@ -137,6 +137,7 @@ public class SnakeGame extends Application {
 
     private void displayEndScreen() {
         steering.stop();
+        board.executor().shutdownNow();
         runLater(() -> {
             boardView.setOnKeyPressed(keyEvent -> {});
             final var label = new Label("Game over! Press any key to continue.");
@@ -168,6 +169,8 @@ public class SnakeGame extends Application {
                 shutdownLogs.log(WARNING, "Timer: ON");
             timer.executor().shutdownNow();
         }
+        if (board != null)
+            board.executor().shutdownNow();
         System.exit(0);
     }
 }
