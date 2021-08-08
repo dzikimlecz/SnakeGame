@@ -75,7 +75,7 @@ public class SnakeGame extends Application {
         ptsLabel.setFont(font(25));
         highscoreLabel.setFont(font(25));
         highscoreLabel.textProperty().bind(Bindings.concat("Highscore: ", highscore, " pts"));
-        boardView = new BoardView();
+        boardView = new BoardView(5);
         setMargin(boardView, new Insets(10, 250, 0, 250));
         initNewGame();
     }

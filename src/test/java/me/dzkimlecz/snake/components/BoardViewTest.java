@@ -24,7 +24,7 @@ class BoardViewTest {
     @DisplayName("Should display board")
 //    pass
     public void boardDisplayTest() {
-        boardView = new BoardView();
+        boardView = new BoardView(1);
         board = new GameBoard(10);
         boardView.bind(board);
         for (int i = 0; i < 10; i++)
@@ -37,7 +37,7 @@ class BoardViewTest {
     @DisplayName("should display changes on the board in the real time")
 //    pass
     public void colorChangeTest() {
-        boardView = new BoardView();
+        boardView = new BoardView(1);
         board = new GameBoard(10);
         boardView.bind(board);
         final var executor = Executors.newSingleThreadScheduledExecutor();
