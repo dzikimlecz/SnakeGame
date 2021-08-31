@@ -1,6 +1,8 @@
 package me.dzkimlecz.snake.game;
 
 import me.dzkimlecz.snake.util.Pair;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -12,13 +14,14 @@ public class Snake {
     private final Deque<Pair<Integer>> body;
     private final Deque<Direction> turns;
     private final AtomicReference<Direction> direction;
-    private final AtomicReference<Pair<Integer>> leftSquare = new AtomicReference<>();
+    private final AtomicReference<Pair<Integer>> leftSquare;
 
     public Snake(Pair<Integer> location) {
         direction = new AtomicReference<>(TOP);
         body = new LinkedList<>();
         body.addFirst(location);
         turns = new ArrayDeque<>(3);
+        leftSquare = new AtomicReference<>();
     }
 
     public int size() {
@@ -34,29 +37,40 @@ public class Snake {
     }
 
     public void move() {
-        final var head = body.getFirst();
-        leftSquare.set(body.removeLast());
-        final var direction = turns.isEmpty() ? this.direction.get() : turns.pollFirst();
-        this.direction.set(direction);
-        final Pair<Integer> delta;
-        switch (direction) {
+        moveTail();
+        checkIfTurns();
+        moveHead(getMoveDelta());
+    }
+
+    private void moveHead(Pair<Integer> delta) {
+        final var head = headLocation();
+        final var newHead = Pair.of(head.first() + delta.first(), head.second() + delta.second());
+        body.addFirst(newHead);
+    }
+
+    @NotNull
+    private Pair<Integer> getMoveDelta() {
+        switch (direction.get()) {
             case TOP:
-                delta = Pair.of(0, -1);
-                break;
+                return Pair.of(0, -1);
             case BOTTOM:
-                delta = Pair.of(0, 1);
-                break;
+                return Pair.of(0, 1);
             case LEFT:
-                delta = Pair.of(-1, 0);
-                break;
+                return Pair.of(-1, 0);
             case RIGHT:
-                delta = Pair.of(1, 0);
-                break;
+                return Pair.of(1, 0);
             default:
                 throw new AssertionError();
         }
-        final var newHead = Pair.of(head.first() + delta.first(), head.second() + delta.second());
-        body.addFirst(newHead);
+    }
+
+    private void checkIfTurns() {
+        if (!turns.isEmpty())
+            direction.set(turns.pollFirst());
+    }
+
+    private void moveTail() {
+        leftSquare.set(body.removeLast());
     }
 
     public void grow() {
@@ -66,7 +80,7 @@ public class Snake {
         body.addLast(e);
     }
 
-    public boolean overlaysItself() {
+    public boolean hasHitItself() {
         return body.stream().distinct().count() < body.size();
     }
 
@@ -74,6 +88,7 @@ public class Snake {
         return body.getFirst();
     }
 
+    @Contract(pure = true)
     public Collection<Pair<Integer>> bodyLocation() {
         return body.stream().collect(Collectors.toUnmodifiableList());
     }

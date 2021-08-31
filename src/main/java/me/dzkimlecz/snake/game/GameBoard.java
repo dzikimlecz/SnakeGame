@@ -1,13 +1,11 @@
 package me.dzkimlecz.snake.game;
 
 import javafx.beans.property.SimpleObjectProperty;
-import me.dzkimlecz.snake.util.ExecutorControl;
 import me.dzkimlecz.snake.util.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import static javafx.application.Platform.runLater;
@@ -20,18 +18,20 @@ public class GameBoard {
         return size;
     }
 
-    private final Queue<Pair<Integer>> newApples;
-    private final List<Pair<Integer>> applesOnBoard;
     private final int maxApples;
-    private final List<List<SimpleObjectProperty<SquareState>>> squareStateProperties;
-    private final AtomicReference<Snake> snake;
-
-    public ExecutorService executor() {
-        return new ExecutorControl(executor);
+    private final Queue<Pair<Integer>> applesReserve;
+    private final List<Pair<Integer>> applesOnBoard;
+    public List<Pair<Integer>> apples() {
+        return List.copyOf(applesOnBoard);
     }
 
-    private final ExecutorService executor;
-
+    private final List<List<SimpleObjectProperty<SquareState>>> squareStateProperties;
+    public SimpleObjectProperty<SquareState> squareStateProperty(int x, int y) {
+        return squareStateProperties.get(y).get(x);
+    }
+    public SimpleObjectProperty<SquareState> squareStateProperty(@NotNull Pair<Integer> xy) {
+        return squareStateProperty(xy.first(), xy.second());
+    }
 
     public GameBoard(int size) {
         this(size, (int) (size * 0.6));
@@ -40,75 +40,109 @@ public class GameBoard {
     public GameBoard(int size, int maxApples) {
         this.size = size;
         this.maxApples = maxApples;
-        newApples = new ArrayDeque<>(5);
+        applesReserve = new ArrayDeque<>(5);
         applesOnBoard = new LinkedList<>();
         squareStateProperties = new ArrayList<>();
+        fillBoard();
+    }
+
+    private void fillBoard() {
         for (int i = 0; i < size; i++) {
             squareStateProperties.add(new ArrayList<>());
             for (int j = 0; j < size; j++)
                 squareStateProperties.get(i).add(new SimpleObjectProperty<>(EMPTY));
         }
-        executor = Executors.newSingleThreadExecutor();
-        snake = new AtomicReference<>();
     }
-
-    /**
-     * generates new apples, and puts one on the board.
-     */
-    public void tick() {
-        //makes sure that there will be at least 2 apples in reserve, but also not more than 4
-        if (newApples.size() < 4) do {
-            newApples.offer(Pair.of(rand(size), rand(size)));
-        } while(newApples.size() < 2);
-
-        // spawns apple if there are less than a fifth of the limit,
-        // or else if the limit hasn't been surpassed yet, spawns apple on a chance of 1 to 25
-        if ((applesOnBoard.size() < (maxApples / 5)) ||
-                ((applesOnBoard.size() < maxApples) && (rand(25) == 0))) {
-            Pair<Integer> newLocation;
-            // polls new apple location from the reserve
-            do {
-                newLocation = Objects.requireNonNull(newApples.poll());
-            } // repeats if there already is such apple on the board, or the location is occupied by a snake
-            while (applesOnBoard.contains(newLocation) || squareStateProperty(newLocation).get().isSnake());
-            //commits a valid apple
-            applesOnBoard.add(newLocation);
-            squareStateProperty(newLocation).set(APPLE);
-        }
-    }
-
-    public List<Pair<Integer>> apples() {
-        return List.copyOf(applesOnBoard);
-    }
-
-    public SimpleObjectProperty<SquareState> squareStateProperty(int x, int y) {
-        return squareStateProperties.get(y).get(x);
-    }
-
-    public SimpleObjectProperty<SquareState> squareStateProperty(@NotNull Pair<Integer> xy) {
-        return squareStateProperty(xy.first(), xy.second());
-    }
-
 
     /**
      * Sets squares on the board to contain a snake, makes snake grow if it ate an apple.
      * @param snake snake to be shown on the board
      * @throws SnakeDeadException if the snake has extended board limits or has hit itself
      */
-    public void update(Snake snake) throws SnakeDeadException {
-        this.snake.set(snake);
-        Callable<Boolean> update = this::updateImpl;
-        final var future = executor.submit(update);
-        try {
-            final var fail = !future.get();
-            if (fail) throw new SnakeDeadException();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void update(Snake snake) {
+        clearBoard();
+        checkIfSnakeIsAlive(snake);
+        checkIfSnakeEatsAnApple(snake);
+        markSquaresAsSnakeContaining(squaresOnWhichSnakeLays(snake));
     }
 
-    private boolean updateImpl() {
-        // refreshes whole board
+    public void spawnApple() {
+        topUpReserve();
+        if (toLittleApples() || doRandomAppleSpawn()) performSpawn();
+    }
+
+    private void performSpawn() {
+        @NotNull Pair<Integer> newLocation;
+        do {
+            newLocation = getFromReserve();
+        } while (suchApplePresent(newLocation) || isOccupiedBySnake(newLocation));
+        commitApple(newLocation);
+    }
+
+    @NotNull
+    private Pair<Integer> getFromReserve() {
+        return Objects.requireNonNull(applesReserve.poll());
+    }
+
+    private boolean suchApplePresent(@NotNull Pair<Integer> newLocation) {
+        return applesOnBoard.contains(newLocation);
+    }
+
+    private boolean isOccupiedBySnake(@NotNull Pair<Integer> newLocation) {
+        return squareStateProperty(newLocation).get().isSnake();
+    }
+
+    private void commitApple(@NotNull Pair<Integer> newLocation) {
+        applesOnBoard.add(newLocation);
+        squareStateProperty(newLocation).set(APPLE);
+    }
+
+    private boolean toLittleApples() {
+        return applesOnBoard.size() < (maxApples / 5);
+    }
+
+    private boolean doRandomAppleSpawn() {
+        return (applesOnBoard.size() < maxApples) && (rand(25) == 0);
+    }
+
+    private void topUpReserve() {
+        if (applesReserve.size() < 4) do {
+            applesReserve.offer(Pair.of(rand(size), rand(size)));
+        } while(applesReserve.size() < 2);
+    }
+
+    private void checkIfSnakeIsAlive(Snake snake) {
+        if (doesSnakeExceedBoard(snake) || snake.hasHitItself())
+            throw new SnakeDeadException();
+    }
+
+    private void markSquaresAsSnakeContaining(List<SimpleObjectProperty<SquareState>> squaresOnWhichSnakeLays) {
+        runLater(() -> {
+            for (SimpleObjectProperty<SquareState> square : squaresOnWhichSnakeLays)
+                square.set(SNAKE_BODY);
+        });
+    }
+
+    /* DOESN'T CONTAIN THE SQUARE ON WHICH HEAD IS LOCATED. */
+    @NotNull
+    private List<SimpleObjectProperty<SquareState>> squaresOnWhichSnakeLays(@NotNull Snake snake) {
+        final var location = snake.bodyLocation();
+        return location.stream()
+                // excludes head
+                .dropWhile(e -> e.equals(snake.headLocation()))
+                // maps to the corresponding square
+                .map(this::squareStateProperty)
+                .collect(Collectors.toList());
+    }
+
+    private void checkIfSnakeEatsAnApple(@NotNull Snake snake) {
+        final var headLocation = snake.headLocation();
+        if (suchApplePresent(headLocation))
+            makeSnakeEat(snake);
+        runLater(() -> squareStateProperty(headLocation).set(SNAKE_HEAD));
+    }
+
+    private void clearBoard() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 final var property = squareStateProperty(j, i);
@@ -116,32 +150,22 @@ public class GameBoard {
                     runLater(() -> property.set(EMPTY));
             }
         }
-        var snake = this.snake.get();
+    }
+
+    private void makeSnakeEat(@NotNull Snake snake) {
+        applesOnBoard.remove(snake.headLocation());
+        snake.grow();
+    }
+
+    private boolean doesSnakeExceedBoard(@NotNull Snake snake) {
         final var location = snake.bodyLocation();
-        // checks if any of the snake segments is out of the board or if it hit itself
-        if (location.stream().anyMatch(xy -> {
-            int x = xy.first();
-            int y = xy.second();
-            return x < 0 || x >= size || y < 0 || y >= size;
-        }) || snake.overlaysItself())
-            return false;
-        final var headLocation = snake.headLocation();
-        // if head was at a location of an apple, snake eats it and grows
-        if (applesOnBoard.remove(headLocation)) snake.grow();
-            runLater(() -> squareStateProperty(headLocation).set(SNAKE_HEAD));
-        // collects all the squares containing the snake, except of the head
-        var squares = location.stream()
-                // excludes head
-                .dropWhile(e -> e.equals(headLocation))
-                // maps to the corresponding square
-                .map(this::squareStateProperty)
-                // marks as a part of the body
-                .collect(Collectors.toList());
-        // marks them all as SNAKE_BODY
-        runLater(() -> {
-            for (SimpleObjectProperty<SquareState> squareState : squares) squareState.set(SNAKE_BODY);
-        });
-        return true;
+        return location.stream().anyMatch(this::coordsOutOfBoard);
+    }
+
+    private boolean coordsOutOfBoard(@NotNull Pair<Integer> xy) {
+        int x = xy.first();
+        int y = xy.second();
+        return x < 0 || x >= size || y < 0 || y >= size;
     }
 
     /**

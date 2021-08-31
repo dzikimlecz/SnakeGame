@@ -56,7 +56,7 @@ public class Timer implements Runnable {
             throw new IllegalStateException("Can't use the same timer object more than once");
 
         mainTask = executor.scheduleWithFixedDelay(() -> {
-            board.tick();
+            board.spawnApple();
             snake.move();
             try {
                 board.update(snake);

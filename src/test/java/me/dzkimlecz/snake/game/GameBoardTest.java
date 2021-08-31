@@ -17,7 +17,7 @@ class GameBoardTest {
             var executor = Executors.newSingleThreadScheduledExecutor();
             var board = new GameBoard(10);
         //When
-            executor.scheduleAtFixedRate(board::tick, 0, 200, TimeUnit.MILLISECONDS);
+            executor.scheduleAtFixedRate(board::spawnApple, 0, 200, TimeUnit.MILLISECONDS);
         //Then
             for (int i = 0; i < 10; i++) {
                 sleep();

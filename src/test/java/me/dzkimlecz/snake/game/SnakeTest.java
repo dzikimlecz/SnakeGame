@@ -78,6 +78,6 @@ class SnakeTest {
             snake.grow();
         }
         //Then
-        assertTrue(snake.overlaysItself());
+        assertTrue(snake.hasHitItself());
     }
 }
